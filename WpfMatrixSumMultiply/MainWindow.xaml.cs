@@ -47,8 +47,22 @@ namespace Laboratory2
             btnSave.IsEnabled = state;
         }
 
+        private void textbox_onlyNumbers(object sender, TextCompositionEventArgs e)
+        {
+            if (!(Char.IsDigit(e.Text, 0) || (e.Text == ".")
+               && (!e.Text.Contains(".")
+               && e.Text.Length != 0)))
+            {
+                e.Handled = true;
+            }
+        }
+
         private void btnGenerate_Click(object sender, RoutedEventArgs e)
         {
+            if (int.Parse(textBoxSize.Text) > 12) {
+                MessageBox.Show("Размеры матриц слишком большие");
+                return;
+            }
             leftMatrixTextBoxes = UpdateGrid(LeftGrid, int.Parse(textBoxSize.Text));
             rightMatrixTextBoxes = UpdateGrid(RightGrid, int.Parse(textBoxSize.Text));
             UpdateBtnsInteract();
@@ -71,17 +85,13 @@ namespace Laboratory2
         public string GetPathFile()
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "Result"; // Default file name
-            dlg.DefaultExt = ".csv"; // Default file extension
-            dlg.Filter = "CSV Table (.csv)|*.csv"; // Filter files by extension
+            dlg.FileName = "Result";
+            dlg.DefaultExt = ".csv";
+            dlg.Filter = "CSV Table (.csv)|*.csv";
 
-            // Show save file dialog box
             Nullable<bool> result = dlg.ShowDialog();
-
-            // Process save file dialog box results
             if (result == true)
             {
-                // Save document
                 return dlg.FileName;
             }
             else return null;
@@ -129,6 +139,7 @@ namespace Laboratory2
                 for (int j = 0; j < size; j++)
                 {
                     result[i, j] = new TextBox();
+                    result[i, j].PreviewTextInput += new TextCompositionEventHandler(textbox_onlyNumbers);
                     result[i, j].Text = "0";
                     uniformGrid.Children.Add(result[i, j]);
                 }
